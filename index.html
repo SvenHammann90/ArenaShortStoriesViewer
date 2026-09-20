@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arena Short Stories — one-prompt fiction, curated</title>
+  <meta name="description" content="A curated shelf of the best short stories to come out of single-prompt Arena.AI experiments — every prompt published in full, with the model that wrote it.">
+  <meta name="theme-color" content="#faf7f1">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('ass-theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="Arena Short Stories — home">
+        <svg class="brand-glyph" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3v18M4.2 7.3l15.6 9.4M19.8 7.3L4.2 16.7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+        </svg>
+        <span>Arena&nbsp;Short&nbsp;Stories</span>
+      </a>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light / dark theme">
+        <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.6 14.2A8.8 8.8 0 0 1 9.8 3.4a8.8 8.8 0 1 0 10.8 10.8Z"/>
+        </svg>
+        <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.4"/>
+          <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="hero">
+      <h1 class="hero-title">One prompt. <em>One story.</em></h1>
+      <p class="hero-sub">A curated shelf of the best short stories to come out of
+        <a href="https://arena.ai">Arena.AI</a> experiments — each written from a single prompt,
+        published unedited, prompt and all.</p>
+      <p class="hero-stats" id="heroStats"></p>
+    </section>
+
+    <div class="toolbar" id="toolbar" hidden>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>
+        </svg>
+        <input id="q" type="search" placeholder="Search titles, prompts, models…" aria-label="Search stories" autocomplete="off">
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Filter by model"></div>
+    </div>
+
+    <section class="toc" id="list" aria-live="polite"></section>
+
+    <div class="empty" id="empty" hidden>
+      <div class="ornament" aria-hidden="true"></div>
+      <h2>The shelf is empty — for now.</h2>
+      <p>No stories have been published yet. If you’re the curator, open the studio and add the first one.</p>
+      <p><a class="btn" href="admin.html">Curator studio&nbsp;→</a></p>
+    </div>
+
+    <div class="empty" id="noMatch" hidden>
+      <h2>Nothing matches.</h2>
+      <p>Try a different search, or clear the model filter.</p>
+    </div>
+
+    <div class="empty" id="loadError" hidden>
+      <h2>Couldn’t load the library.</h2>
+      <p>The story index failed to load. This is usually a passing hiccup —
+        <a href="index.html">try again</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Curated by hand from <a href="https://arena.ai">Arena.AI</a> experiments. Every story here
+        is AI-written from a single prompt — published unedited, prompt and all.</p>
+      <p class="foot-meta">
+        <a href="https://github.com/SvenHammann90/ArenaShortStoriesViewer">Source on GitHub</a>
+        <span class="dot">·</span>
+        <a href="admin.html">Curator studio</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
