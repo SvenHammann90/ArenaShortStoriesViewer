@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curator studio · Arena Short Stories</title>
+  <meta name="description" content="Publish, edit and remove the stories on Arena Short Stories.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#faf7f1">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('ass-theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="Arena Short Stories — home">
+        <svg class="brand-glyph" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3v18M4.2 7.3l15.6 9.4M19.8 7.3L4.2 16.7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+        </svg>
+        <span>Arena&nbsp;Short&nbsp;Stories</span>
+      </a>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light / dark theme">
+        <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.6 14.2A8.8 8.8 0 0 1 9.8 3.4a8.8 8.8 0 1 0 10.8 10.8Z"/>
+        </svg>
+        <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.4"/>
+          <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="wrap admin">
+    <section class="admin-intro">
+      <h1>Curator studio</h1>
+      <p>Publish, edit, and remove the stories on the public shelf. Everything is stored as plain
+        JSON in this repository — publishing is an ordinary commit, and the site rebuilds itself
+        a minute or two later.</p>
+    </section>
+
+    <!-- Step 1: token gate -->
+    <section class="card" id="gate">
+      <h2><span class="stepno">1</span> Unlock the studio</h2>
+      <p class="card-sub">The studio talks to GitHub on your behalf. You’ll need a personal access
+        token with <strong>Contents → Read and write</strong> access to
+        <code class="repoName">this repository</code>.</p>
+
+      <ol class="steps">
+        <li>Open
+          <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Settings → Developer settings → Fine-grained personal access tokens</a>
+          and generate a new token.</li>
+        <li>Under <em>Repository access</em>, choose <em>Only select repositories</em> and pick
+          <strong class="repoName">this repository</strong>.</li>
+        <li>Under <em>Permissions</em>, set <em>Contents</em> to <strong>Read and write</strong> —
+          nothing else is needed. (A classic token with the <code>repo</code> scope works too.)</li>
+        <li>Copy the generated token (it starts with <code>github_pat_…</code>) and paste it below.</li>
+      </ol>
+
+      <div class="grid2">
+        <label class="field">
+          <span class="fl">Repository</span>
+          <input id="repoInput" spellcheck="false" autocomplete="off" placeholder="owner/repository">
+        </label>
+        <label class="field">
+          <span class="fl">Access token</span>
+          <input id="tokenInput" type="password" spellcheck="false" autocomplete="off" placeholder="github_pat_…">
+        </label>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-accent" id="unlockBtn" type="button">Unlock</button>
+        <span class="status" id="gateStatus" role="status"></span>
+      </div>
+
+      <p class="fine">The token is kept only in this browser’s local storage and is sent only to
+        <code>api.github.com</code>. Lock the studio — or clear the site’s data — to remove it.
+        You can revoke the token any time on GitHub.</p>
+    </section>
+
+    <!-- Steps 2 & 3: studio -->
+    <div id="studio" hidden>
+
+      <div class="unlockbar">
+        <span class="whoami" id="whoami"></span>
+        <span class="grow"></span>
+        <a class="btn-ghost" href="index.html">View public site&nbsp;↗</a>
+        <button class="btn-ghost" id="lockBtn" type="button">Lock studio</button>
+      </div>
+
+      <section class="card">
+        <h2 id="formHead"><span class="stepno">2</span> <span id="formHeadLabel">Publish a story</span></h2>
+
+        <div class="banner" id="editBanner" hidden>
+          <span class="banner-text"></span>
+          <span class="grow"></span>
+          <button class="btn-ghost" id="cancelEditBtn" type="button">Cancel</button>
+        </div>
+
+        <form id="storyForm" novalidate>
+          <label class="field">
+            <span class="fl">Title</span>
+            <input id="fTitle" maxlength="140" autocomplete="off" spellcheck="true" placeholder="The Cartographer of Silence">
+          </label>
+
+          <div class="grid2">
+            <label class="field">
+              <span class="fl">Model <span class="req">— as shown on Arena</span></span>
+              <input id="fModel" list="modelList" autocomplete="off" placeholder="e.g. Claude Sonnet 4.5">
+              <datalist id="modelList">
+                <option value="Claude Opus 4.5"></option>
+                <option value="Claude Sonnet 4.5"></option>
+                <option value="Claude Haiku 4.5"></option>
+                <option value="GPT-5.2"></option>
+                <option value="GPT-5.1"></option>
+                <option value="GPT-5"></option>
+                <option value="GPT-4.1"></option>
+                <option value="Gemini 3 Pro"></option>
+                <option value="Gemini 3 Flash"></option>
+                <option value="Gemini 2.5 Pro"></option>
+                <option value="Grok 4.1"></option>
+                <option value="Grok 4"></option>
+                <option value="Kimi K2 Thinking"></option>
+                <option value="Qwen3 Max"></option>
+                <option value="DeepSeek V3.2"></option>
+                <option value="GLM-4.6"></option>
+                <option value="Llama 4 Maverick"></option>
+                <option value="Mistral Large 3"></option>
+              </datalist>
+            </label>
+            <label class="field">
+              <span class="fl">Date</span>
+              <input id="fDate" type="date">
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="fl">The prompt <span class="req">— the single prompt you gave</span></span>
+            <textarea id="fPrompt" rows="3" placeholder="Write a short story about…"></textarea>
+          </label>
+
+          <label class="field">
+            <span class="fl">The story</span>
+            <textarea id="fStory" rows="16" placeholder="Paste the story text here…"></textarea>
+            <span class="hint">Paragraphs are separated by blank lines. Simple markdown is honoured
+              (headings, *italics*, **bold**, &gt; quotes, --- dividers). Tip: if the model repeated
+              the title as a first line, delete that line here.</span>
+          </label>
+
+          <div class="row">
+            <button class="btn btn-accent" id="publishBtn" type="submit">Publish story</button>
+            <button class="btn-ghost" id="previewBtn" type="button">Preview</button>
+            <span class="status" id="formStatus" role="status"></span>
+          </div>
+          <p class="fine" id="storyStats"></p>
+        </form>
+
+        <section class="preview" id="previewPanel" hidden>
+          <div class="preview-head">
+            <span>Preview — how it will read on the site</span>
+            <button class="btn-ghost" id="closePreviewBtn" type="button">Close</button>
+          </div>
+          <article class="story" id="previewBody"></article>
+        </section>
+      </section>
+
+      <section class="card">
+        <h2><span class="stepno">3</span> Library <span class="count" id="libCount"></span></h2>
+        <div class="library" id="library"></div>
+        <p class="fine">Publishing commits straight to the site’s branch; GitHub Pages rebuilds
+          the public site a minute or two after each commit.</p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Curated by hand from <a href="https://arena.ai">Arena.AI</a> experiments. Every story here
+        is AI-written from a single prompt — published unedited, prompt and all.</p>
+      <p class="foot-meta">
+        <a href="https://github.com/SvenHammann90/ArenaShortStoriesViewer">Source on GitHub</a>
+        <span class="dot">·</span>
+        <a href="index.html">Public site</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
